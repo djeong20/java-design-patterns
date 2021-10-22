@@ -1,0 +1,8 @@
+@startuml
+package com.iluwatar.implicitlock {
+  class App {
+    - LOGGER : Logger {static}
+    + App()
+  }
+}
+@enduml
