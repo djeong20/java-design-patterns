@@ -1,5 +1,7 @@
 package com.iluwatar.pessimisticofflinelock;
 
+import java.util.ArrayList;
+
 public interface Manager {
   public Customer find(Long id);
 
