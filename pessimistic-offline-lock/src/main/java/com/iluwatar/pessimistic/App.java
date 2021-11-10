@@ -21,9 +21,11 @@
  * THE SOFTWARE.
  */
 
-package com.iluwatar.pessimisticofflinelock;
+package com.iluwatar.pessimistic;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
 
 /**
  * Summary
@@ -42,6 +44,30 @@ public class App {
   * @param args command line args
   */
   public static void main(String[] args) {
+    LockManager lockManager = new LockManager();
+    lockManager.insert(new Customer("Timothy Cole"));
+    lockManager.insert(new Customer("Jake Hill"));
+    lockManager.insert(new Customer("Ben Webster"));
+
+    // Admins
+    long id_martin = 1200;
+    long id_david = 1004;
+
+    Customer jake_m = lockManager.getCustomer(1L, id_martin);
+    Customer jake_d = lockManager.getCustomer(1L, id_david);
+
+    if (jake_m != null) {
+      System.out.println(jake_m.getName());
+    }
+    if (jake_d != null) {
+      System.out.println(jake_d.getName());
+    }
+
+    lockManager.release(1L, id_martin);
+    Customer jake_d2 = lockManager.getCustomer(1L, id_david);
+    if (jake_d2 != null) {
+      System.out.println(jake_d2.getName());
+    }
 
   }
 }
