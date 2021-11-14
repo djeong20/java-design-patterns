@@ -1,6 +1,6 @@
-package com.iluwater.pessimisticofflinelock;
+package com.iluwater.pessimistic;
 
-import com.iluwatar.pessimisticofflinelock.App;
+import com.iluwatar.pessimistic.App;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

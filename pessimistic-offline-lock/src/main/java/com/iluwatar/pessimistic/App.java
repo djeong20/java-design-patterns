@@ -25,8 +25,6 @@ package com.iluwatar.pessimistic;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
-
 /**
  * Summary
  * Prevents conflicts between concurrent transactions by allowing
@@ -50,23 +48,23 @@ public class App {
     lockManager.insert(new Customer("Ben Webster"));
 
     // Admins
-    long id_martin = 1200;
-    long id_david = 1004;
+    long martinId = 1200;
+    long davidId = 1004;
 
-    Customer jake_m = lockManager.getCustomer(1L, id_martin);
-    Customer jake_d = lockManager.getCustomer(1L, id_david);
+    Customer jake1 = lockManager.getCustomer(1L, martinId);
+    Customer jake2 = lockManager.getCustomer(1L, davidId);
 
-    if (jake_m != null) {
-      System.out.println(jake_m.getName());
+    if (jake1 != null) {
+      System.out.println(jake1.getName());
     }
-    if (jake_d != null) {
-      System.out.println(jake_d.getName());
+    if (jake2 != null) {
+      System.out.println(jake2.getName());
     }
 
-    lockManager.release(1L, id_martin);
-    Customer jake_d2 = lockManager.getCustomer(1L, id_david);
-    if (jake_d2 != null) {
-      System.out.println(jake_d2.getName());
+    lockManager.release(1L, martinId);
+    Customer jake3 = lockManager.getCustomer(1L, davidId);
+    if (jake3 != null) {
+      System.out.println(jake3.getName());
     }
 
   }

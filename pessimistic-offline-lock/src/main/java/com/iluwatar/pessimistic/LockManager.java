@@ -12,43 +12,45 @@ public class LockManager implements Manager {
   private Lock mutex;
   private long newCustomerId = 0;
 
-  // Lock Manager Default Constructor
+  /**
+   * Lock Manager Default Constructor.
+   */
   public LockManager() {
     customers = new HashMap<>();           // key: customer id, value: customer info
     accessPermissions = new HashMap<>();  // key: customer id, value: owner id
     mutex = new ReentrantLock(true);
   }
 
-  // Lock Manager Constructor using list of customer
+  /**
+   * Lock Manager Constructor using list of customers.
+   */
   public LockManager(List<Customer> customerList) {
     customers = new HashMap<>();
     accessPermissions = new HashMap<>();
     mutex = new ReentrantLock(true);
 
-    for (Customer new_customer : customerList) {
-      insert(new_customer);
+    for (Customer newCustomer : customerList) {
+      insert(newCustomer);
     }
   }
 
+  /**
+   * Returns customer if it's not owned by any administrator.
+   */
   public Customer getCustomer(Long customerId, Long ownerId) {
     // TODO: Need to acquire mutex lock
     mutex.lock();
     try {
-      Long current_owner_id = accessPermissions.get(customerId);
-//      System.out.println("Trying to access customer " + customerId + " by " + ownerId + "...");
+      Long currentOwnerId = accessPermissions.get(customerId);
 
-      // if no owner
-      if (current_owner_id == -1) {
-        // the one who requested has only access to customer
-//        System.out.println("Customer " + customerId + " is acquired by " + ownerId);
+      // If no one have the access permission
+      if (currentOwnerId == -1) {
+        // The one who requested has the only access to the customer's information
         accessPermissions.put(customerId, ownerId);
         mutex.unlock();
 
         return customers.get(customerId);
-      }
-      else {
-//        System.out.println("Failed to access. Owned by " + current_owner_id);
-
+      } else {
         mutex.unlock();
         return null;
       }
@@ -60,45 +62,53 @@ public class LockManager implements Manager {
     return null;
   }
 
+  /**
+   * Update customer's information if it's owned by the same administrator.
+   * In order to update, you need to get customer first and have access permission.
+   */
   public void updateCustomerInfo(Customer customer, Long ownerId) {
     // if admin has access permission, update customer info
-    long customer_id = customer.getID();
-    long current_owner_id = accessPermissions.get(customer_id);
+    long customerId = customer.getID();
+    long currentOwnerId = accessPermissions.get(customerId);
 
-    if (current_owner_id == ownerId) {
-      customers.replace(customer_id, customer);
+    if (currentOwnerId == ownerId) {
+      customers.replace(customerId, customer);
     }
   }
 
+  /**
+   * Insert new customer information.
+   */
   public void insert(Customer newCustomer) {
     newCustomer.setID(newCustomerId);
-    customers.put(newCustomerId, newCustomer); // insert new customer
+    customers.put(newCustomerId, newCustomer);
     accessPermissions.put(newCustomerId, (long) -1);
     newCustomerId++;
   }
 
+  /**
+   * Delete current customer's information.
+   */
   public void delete(Long customerId, Long ownerId) {
-    Long current_owner_id = accessPermissions.get(customerId);
+    Long currentOwnerId = accessPermissions.get(customerId);
 
-    if (current_owner_id.longValue() == ownerId.longValue()) {
+    if (currentOwnerId.longValue() == ownerId.longValue()) {
       customers.remove(customerId);
       accessPermissions.remove(customerId);
     }
   }
 
+  /**
+   * Release access permission to customer's information.
+   * if it's owned by the administrator who owns access permission.
+   */
   public void release(Long customerId, Long ownerId) {
     mutex.lock();
     try {
-      Long current_owner_id = accessPermissions.get(customerId);
-//      System.out.println("Attempt to release customer lock " + customerId);
-//      System.out.println("Current owner: " + current_owner_id + " Requested admin : " + ownerId);
+      Long currentOwnerId = accessPermissions.get(customerId);
 
-      if (current_owner_id.longValue() == ownerId.longValue()) {
-//        System.out.println("Release customer " + customerId + " by " + current_owner_id);
+      if (currentOwnerId.longValue() == ownerId.longValue()) {
         accessPermissions.replace(customerId, (long) -1);
-      }
-      else {
-//        System.out.println("Failed: ID unmatched");
       }
 
     } catch (Exception e) {
