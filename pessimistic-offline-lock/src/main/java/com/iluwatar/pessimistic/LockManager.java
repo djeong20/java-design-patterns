@@ -11,6 +11,7 @@ public class LockManager implements Manager {
   private Map<Long, Long> accessPermissions;
   private Lock mutex;
   private long newCustomerId = 0;
+  public int total = 0;
 
   /**
    * Lock Manager Default Constructor.
@@ -35,6 +36,30 @@ public class LockManager implements Manager {
   }
 
   /**
+   * Insert new customer information.
+   */
+  public void insert(Customer newCustomer) {
+    newCustomer.setID(newCustomerId);
+    customers.put(newCustomerId, newCustomer);
+    accessPermissions.put(newCustomerId, (long) -1);
+    newCustomerId++;
+    total++;
+  }
+
+  /**
+   * Delete current customer's information.
+   */
+  public void delete(Long customerId, Long ownerId) {
+    Long currentOwnerId = accessPermissions.get(customerId);
+
+    if (currentOwnerId.longValue() == ownerId.longValue()) {
+      customers.remove(customerId);
+      accessPermissions.remove(customerId);
+      total--;
+    }
+  }
+
+  /**
    * Returns customer if it's not owned by any administrator.
    */
   public Customer getCustomer(Long customerId, Long ownerId) {
@@ -44,7 +69,7 @@ public class LockManager implements Manager {
       Long currentOwnerId = accessPermissions.get(customerId);
 
       // If no one have the access permission
-      if (currentOwnerId == -1) {
+      if (currentOwnerId == -1 || currentOwnerId == ownerId) {
         // The one who requested has the only access to the customer's information
         accessPermissions.put(customerId, ownerId);
         mutex.unlock();
@@ -63,54 +88,22 @@ public class LockManager implements Manager {
   }
 
   /**
-   * Update customer's information if it's owned by the same administrator.
-   * In order to update, you need to get customer first and have access permission.
-   */
-  public void updateCustomerInfo(Customer customer, Long ownerId) {
-    // if admin has access permission, update customer info
-    long customerId = customer.getID();
-    long currentOwnerId = accessPermissions.get(customerId);
-
-    if (currentOwnerId == ownerId) {
-      customers.replace(customerId, customer);
-    }
-  }
-
-  /**
-   * Insert new customer information.
-   */
-  public void insert(Customer newCustomer) {
-    newCustomer.setID(newCustomerId);
-    customers.put(newCustomerId, newCustomer);
-    accessPermissions.put(newCustomerId, (long) -1);
-    newCustomerId++;
-  }
-
-  /**
-   * Delete current customer's information.
-   */
-  public void delete(Long customerId, Long ownerId) {
-    Long currentOwnerId = accessPermissions.get(customerId);
-
-    if (currentOwnerId.longValue() == ownerId.longValue()) {
-      customers.remove(customerId);
-      accessPermissions.remove(customerId);
-    }
-  }
-
-  /**
    * Release access permission to customer's information.
    * if it's owned by the administrator who owns access permission.
    */
-  public void release(Long customerId, Long ownerId) {
+  public void release(Customer customer, Long ownerId) {
     mutex.lock();
     try {
-      Long currentOwnerId = accessPermissions.get(customerId);
+      if (customer != null) {
+        long customerId = customer.getID();
 
-      if (currentOwnerId.longValue() == ownerId.longValue()) {
-        accessPermissions.replace(customerId, (long) -1);
+        Long currentOwnerId = accessPermissions.get(customerId);
+
+        if (currentOwnerId.longValue() == ownerId.longValue()) {
+          accessPermissions.replace(customerId, (long) -1);
+          customer = null;
+        }
       }
-
     } catch (Exception e) {
       e.printStackTrace();
     }

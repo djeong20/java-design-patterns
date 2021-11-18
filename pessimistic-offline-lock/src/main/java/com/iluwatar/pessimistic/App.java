@@ -51,21 +51,33 @@ public class App {
     long martinId = 1200;
     long davidId = 1004;
 
-    Customer jake1 = lockManager.getCustomer(1L, martinId);
-    Customer jake2 = lockManager.getCustomer(1L, davidId);
+    System.out.println("Martin attempts to acquire permission to access customer " + 1L);
+    Customer martinCustomer = lockManager.getCustomer(1L, martinId);
 
-    if (jake1 != null) {
-      System.out.println(jake1.getName());
-    }
-    if (jake2 != null) {
-      System.out.println(jake2.getName());
-    }
+    System.out.println("David attempts to acquire permission to access customer " + 1L);
+    Customer davidCustomer = lockManager.getCustomer(1L, davidId);
 
-    lockManager.release(1L, martinId);
-    Customer jake3 = lockManager.getCustomer(1L, davidId);
-    if (jake3 != null) {
-      System.out.println(jake3.getName());
+    if (martinCustomer != null) {
+      System.out.println("Martin's Customer is " + martinCustomer.getName());
+    } else {
+      System.out.println("Martin has no customer");
     }
 
+    if (davidCustomer != null) {
+      System.out.println(davidCustomer.getName());
+    } else {
+      System.out.println("David has no customer");
+    }
+
+    System.out.println("Martin releases customer " + martinCustomer.getID());
+    lockManager.release(martinCustomer, martinId);
+
+    System.out.println("David attempts to acquire permission to access customer " + 1L);
+    davidCustomer = lockManager.getCustomer(1L, davidId);
+    if (davidCustomer != null) {
+      System.out.println("David's Customer is "  + davidCustomer.getName());
+    } else {
+      System.out.println("David has no customer");
+    }
   }
 }
