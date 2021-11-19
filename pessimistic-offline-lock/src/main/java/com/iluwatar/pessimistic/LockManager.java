@@ -15,6 +15,7 @@ public class LockManager implements Manager {
 
   /**
    * Lock Manager Default Constructor.
+   * Initialize private variables.
    */
   public LockManager() {
     customers = new HashMap<>();           // key: customer id, value: customer info
@@ -24,6 +25,8 @@ public class LockManager implements Manager {
 
   /**
    * Lock Manager Constructor using list of customers.
+   * Initialize private variables using list of customers.
+   * @param customerList - List of customers
    */
   public LockManager(List<Customer> customerList) {
     customers = new HashMap<>();
@@ -37,6 +40,7 @@ public class LockManager implements Manager {
 
   /**
    * Insert new customer information.
+   * @param newCustomer - Customer
    */
   public void insert(Customer newCustomer) {
     newCustomer.setID(newCustomerId);
@@ -48,6 +52,8 @@ public class LockManager implements Manager {
 
   /**
    * Delete current customer's information.
+   * @param customerId - Customer ID
+   * @param ownerId - Administrator ID
    */
   public void delete(Long customerId, Long ownerId) {
     Long currentOwnerId = accessPermissions.get(customerId);
@@ -60,7 +66,10 @@ public class LockManager implements Manager {
   }
 
   /**
-   * Returns customer if it's not owned by any administrator.
+   * Returns customer if it's not owned by any administrator and lock the access permission.
+   *  @param customerId - Customer ID
+   *  @param ownerId - Administrator ID
+   *  @return customer - customer
    */
   public Customer getCustomer(Long customerId, Long ownerId) {
     // TODO: Need to acquire mutex lock
@@ -90,6 +99,8 @@ public class LockManager implements Manager {
   /**
    * Release access permission to customer's information.
    * if it's owned by the administrator who owns access permission.
+   *  @param customer - customer
+   *  @param ownerId - Administrator ID
    */
   public void release(Customer customer, Long ownerId) {
     mutex.lock();
