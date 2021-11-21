@@ -9,12 +9,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class CustomerTest {
 
+    /**
+     * This test is used to confirm that customer ID is correctly set
+     */
     @Test
-    void testCustomer() {
-        var customer = new Customer();
+    void testCustomerID() {
+        final var customer = new Customer();
         customer.setID(10L);
+        assertEquals(customer.getID(), 10L, "Customer ID does not match");
+    }
+
+    /**
+     * This test is used to confirm that customer name is correctly set
+     */
+    @Test
+    void testCustomerName() {
+        final var customer = new Customer();
         customer.setName("George Washington");
-        assertEquals(customer.getID(), 10L);
-        assertEquals(customer.getName(), "George Washington");
+        assertEquals(customer.getName(), "George Washington", "Customer name does not match");
     }
 }

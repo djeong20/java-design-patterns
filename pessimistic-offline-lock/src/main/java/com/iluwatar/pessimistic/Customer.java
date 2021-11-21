@@ -1,11 +1,15 @@
 package com.iluwatar.pessimistic;
 
+/**
+ * This class contains every customer information.
+ * @author Donghyeon Jeong
+ */
 public class Customer {
-  private Long id;
-  private String name;
+  private transient Long customerId; // Customer ID
+  private String name; // Customer name
 
   /**
-   * Customer Default Constructor.
+   * Default Constructor for Customer class.
    */
   public Customer() {}
 
@@ -13,7 +17,7 @@ public class Customer {
    * Customer Constructor that assigns customer name.
    * @param name - Customer name
    */
-  public Customer(String name) {
+  public Customer(final String name) {
     this.name = name;
   }
 
@@ -21,8 +25,8 @@ public class Customer {
    * Sets the customer ID.
    * @param newId - Customer ID
    */
-  public void setID(Long newId) {
-    this.id = newId;
+  public void setID(final Long newId) {
+    this.customerId = newId;
   }
 
   /**
@@ -30,14 +34,14 @@ public class Customer {
    * @return id - Customer ID
    */
   public Long getID() {
-    return id;
+    return this.customerId;
   }
 
   /**
    * Sets the customer name.
    * @param newName - Customer name
    */
-  public void setName(String newName) {
+  public void setName(final String newName) {
     this.name = newName;
   }
 
@@ -46,7 +50,7 @@ public class Customer {
    * @return name- Customer name
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
 }

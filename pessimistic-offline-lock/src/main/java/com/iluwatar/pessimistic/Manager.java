@@ -1,26 +1,30 @@
 package com.iluwatar.pessimistic;
 
+/**
+ * Manager Interface.
+ */
 public interface Manager {
   /**
    * Insert new customer information.
    * @param newCustomer - Customer
    */
-  public void insert(Customer newCustomer);
+  void insert(Customer newCustomer);
 
   /**
    * Delete current customer's information.
    * @param customerId - Customer ID
    * @param ownerId - Administrator ID
    */
-  public void delete(Long customerId, Long ownerId);
+  void delete(Long customerId, Long ownerId);
 
   /**
-   * Returns customer if it's not owned by any administrator and lock the access permission.
+   *  Returns customer if it's not owned by any administrator.
+   *  If customer is obtained lock the access permission.
    *  @param customerId - Customer ID
    *  @param ownerId - Administrator ID
-   *  @return customer - customer (null if it's owned)
+   *  @return customer - Customer
    */
-  public Customer getCustomer(Long customerId, Long ownerId);
+  Customer getCustomer(Long customerId, Long ownerId);
 
   /**
    * Release access permission to customer's information.
@@ -28,5 +32,5 @@ public interface Manager {
    *  @param customer - customer
    *  @param ownerId - Administrator ID
    */
-  public void release(Customer customer, Long ownerId);
+  void release(Customer customer, Long ownerId);
 }

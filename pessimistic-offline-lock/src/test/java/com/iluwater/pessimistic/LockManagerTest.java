@@ -5,104 +5,116 @@ import com.iluwatar.pessimistic.LockManager;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
+/**
+ * Lock Manager Test
+ */
 class LockManagerTest {
+    private final static String TIMOTHY_COLE = "Timothy Cole"; // Customer name
+    private final static String JAKE_HILL = "Jake Hill"; // Customer name
+    private final static String BEN_WEBSTER = "Ben Webster"; // Customer name
+    private final static long MARTIN_ID = 100L; // Admin ID
+    private final static long DAVID_ID = 102L; // Admin ID
 
     /**
-     * Test if new customer information is inserted
+     * This test is used to confirm that customer information is inserted.
      */
     @Test
     void testInsert() {
-        var lockManager = new LockManager();
-        assertEquals(lockManager.total, 0);
-
-        lockManager.insert(new Customer("Timothy Cole"));
-        assertEquals(lockManager.total, 1);
-
-        lockManager.insert(new Customer("Jake Hill"));
-        assertEquals(lockManager.total, 2);
-
-        lockManager.insert(new Customer("Ben Webster"));
-        assertEquals(lockManager.total, 3);
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
+        assertEquals(3, lockManager.total, "Number of customers does not match");
     }
 
     /**
-     * Test if customer information is deleted
+     * This test is used to confirm that customer information is deleted.
      */
     @Test
-    void testDelete() {
-        var lockManager = new LockManager();
-        assertEquals(lockManager.total, 0);
+    void testDeleteSuccess() {
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
 
-        lockManager.insert(new Customer("Timothy Cole"));
-        lockManager.insert(new Customer("Jake Hill"));
-        lockManager.insert(new Customer("Ben Webster"));
-        assertEquals(lockManager.total, 3);
+        lockManager.getCustomer(1L, MARTIN_ID);
+        lockManager.delete(1L, MARTIN_ID);
 
-        long martinID = 100L;
-        long davidId = 102L;
+        lockManager.getCustomer(0L, DAVID_ID);
+        lockManager.delete(0L, DAVID_ID);
 
-        lockManager.getCustomer(1L, martinID);
-        lockManager.delete(1L, martinID);
-        assertEquals(lockManager.total, 2);
-
-        lockManager.delete(0L, davidId);
-        assertEquals(lockManager.total, 2);
-
-        lockManager.getCustomer(0L, davidId);
-        lockManager.delete(0L, davidId);
-        assertEquals(lockManager.total, 1);
+        assertEquals(1, lockManager.total, "Number of customers does not match");
     }
 
     /**
-     * Test if customer access is locked when admin gets the permission
+     * This test is used to confirm that customer information is not deleted.
      */
     @Test
-    void testLock() {
-        var lockManager = new LockManager();
-        lockManager.insert(new Customer("Timothy Cole"));
-        lockManager.insert(new Customer("Jake Hill"));
-        lockManager.insert(new Customer("Ben Webster"));
+    void testDeleteFail() {
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
 
-        long martinId = 100L;
-        long davidId = 102L;
+        lockManager.getCustomer(1L, MARTIN_ID);
+        lockManager.delete(1L, DAVID_ID);
 
-        Customer martinCustomer = lockManager.getCustomer(1L, martinId);
-        Customer davidCustomer = lockManager.getCustomer(1L, davidId);
+        lockManager.getCustomer(0L, DAVID_ID);
+        lockManager.delete(0L, MARTIN_ID);
 
-        assertEquals(martinCustomer.getName(), "Jake Hill");
-        assertNull(davidCustomer);
+        assertEquals(3, lockManager.total, "Number of customers does not match");
     }
 
     /**
-     * Test if customer access is release when admin release the permission
+     * This test is used to confirm that customer information is locked.
      */
     @Test
-    void testRelease() {
-        var lockManager = new LockManager();
-        lockManager.insert(new Customer("Timothy Cole"));
-        lockManager.insert(new Customer("Jake Hill"));
-        lockManager.insert(new Customer("Ben Webster"));
+    void testLockSuccess() {
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
 
-        long martinId = 100L;
-        long davidId = 102L;
+        lockManager.getCustomer(1L, MARTIN_ID);
+        assertNull(lockManager.getCustomer(1L, DAVID_ID), "Customer information is accessible");
+    }
 
-        Customer martinCustomer = null;
-        Customer davidCustomer = null;
+    /**
+     * This test is used to confirm that customer information is released.
+     */
+    @Test
+    void testReleaseSuccess() {
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
 
-        martinCustomer = lockManager.getCustomer(1L, martinId);
-        davidCustomer = lockManager.getCustomer(1L, davidId);
+        final Customer martinCustomer = lockManager.getCustomer(1L, MARTIN_ID);
 
-        assertEquals(martinCustomer.getName(), "Jake Hill");
-        assertNull(davidCustomer);
+        lockManager.release(martinCustomer, MARTIN_ID);
 
-        lockManager.release(martinCustomer, martinId);
+        final Customer davidCustomer = lockManager.getCustomer(1L, DAVID_ID);
 
-        davidCustomer = lockManager.getCustomer(1L, davidId);
-        martinCustomer = lockManager.getCustomer(1L, martinId);
+        assertEquals(martinCustomer, davidCustomer, "Customer's information does not match");
+    }
 
-        assertNull(martinCustomer);
-        assertEquals(davidCustomer.getName(), "Jake Hill");
+    /**
+     * This test is used to confirm that customer information is not released.
+     */
+    @Test
+    void testReleaseFail() {
+        final var lockManager = new LockManager();
+        lockManager.insert(new Customer(TIMOTHY_COLE));
+        lockManager.insert(new Customer(JAKE_HILL));
+        lockManager.insert(new Customer(BEN_WEBSTER));
+
+        final Customer martinCustomer = lockManager.getCustomer(1L, MARTIN_ID);
+
+        lockManager.release(martinCustomer, DAVID_ID);
+
+        final Customer davidCustomer = lockManager.getCustomer(1L, DAVID_ID);
+
+        assertNotEquals(martinCustomer, davidCustomer, "Customer's information does match");
     }
 }

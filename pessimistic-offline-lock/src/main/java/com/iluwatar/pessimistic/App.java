@@ -27,12 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Summary
- * Prevents conflicts between concurrent transactions by allowing
- * only one transaction at a time to access data.
- * Use multiple system transactions, at which point manage concurrent access to your data.
+ * Prevents conflicts between concurrent transactions.
+ * Only one transaction at a time to access data.
+ * Use multiple system transactions, manage concurrent access to your data.
  * Pessimistic Offline Lock prevents conflicts by avoiding them altogether.
- * It forces a transaction to acquire a lock on a piece of data before it starts to use it
- * once a transaction begins, complete it without being bounced by concurrency control.
  */
 @Slf4j
 public class App {
@@ -41,43 +39,5 @@ public class App {
   *
   * @param args command line args
   */
-  public static void main(String[] args) {
-    LockManager lockManager = new LockManager();
-    lockManager.insert(new Customer("Timothy Cole"));
-    lockManager.insert(new Customer("Jake Hill"));
-    lockManager.insert(new Customer("Ben Webster"));
-
-    // Admins
-    long martinId = 1200;
-    long davidId = 1004;
-
-    System.out.println("Martin attempts to acquire permission to access customer " + 1L);
-    Customer martinCustomer = lockManager.getCustomer(1L, martinId);
-
-    System.out.println("David attempts to acquire permission to access customer " + 1L);
-    Customer davidCustomer = lockManager.getCustomer(1L, davidId);
-
-    if (martinCustomer != null) {
-      System.out.println("Martin's Customer is " + martinCustomer.getName());
-    } else {
-      System.out.println("Martin has no customer");
-    }
-
-    if (davidCustomer != null) {
-      System.out.println(davidCustomer.getName());
-    } else {
-      System.out.println("David has no customer");
-    }
-
-    System.out.println("Martin releases customer " + martinCustomer.getID());
-    lockManager.release(martinCustomer, martinId);
-
-    System.out.println("David attempts to acquire permission to access customer " + 1L);
-    davidCustomer = lockManager.getCustomer(1L, davidId);
-    if (davidCustomer != null) {
-      System.out.println("David's Customer is "  + davidCustomer.getName());
-    } else {
-      System.out.println("David has no customer");
-    }
-  }
+  public static void main(final String[] args) { }
 }

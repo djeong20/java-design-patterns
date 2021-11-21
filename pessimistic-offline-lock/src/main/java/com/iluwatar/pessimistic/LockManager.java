@@ -1,17 +1,20 @@
 package com.iluwatar.pessimistic;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * This class manages customers information access permission.
+ * @author Donghyeon Jeong
+ */
 public class LockManager implements Manager {
-  private Map<Long, Customer> customers; // customer have owner (id) once someone calls customer
-  private Map<Long, Long> accessPermissions;
-  private Lock mutex;
-  private long newCustomerId = 0;
-  public int total = 0;
+  private final transient Map<Long, Customer> customers; // Customer Information
+  private final transient Map<Long, Long> accessPermissions; // Access Permission Information
+  private final transient Lock mutex; // Mutex lock
+  private transient long newCustomerId; // New customer's ID
+  public transient int total; // Total number of customers
 
   /**
    * Lock Manager Default Constructor.
@@ -21,28 +24,16 @@ public class LockManager implements Manager {
     customers = new HashMap<>();           // key: customer id, value: customer info
     accessPermissions = new HashMap<>();  // key: customer id, value: owner id
     mutex = new ReentrantLock(true);
-  }
-
-  /**
-   * Lock Manager Constructor using list of customers.
-   * Initialize private variables using list of customers.
-   * @param customerList - List of customers
-   */
-  public LockManager(List<Customer> customerList) {
-    customers = new HashMap<>();
-    accessPermissions = new HashMap<>();
-    mutex = new ReentrantLock(true);
-
-    for (Customer newCustomer : customerList) {
-      insert(newCustomer);
-    }
+    newCustomerId = 0;
+    total = 0;
   }
 
   /**
    * Insert new customer information.
    * @param newCustomer - Customer
    */
-  public void insert(Customer newCustomer) {
+  @Override
+  public void insert(final Customer newCustomer) {
     newCustomer.setID(newCustomerId);
     customers.put(newCustomerId, newCustomer);
     accessPermissions.put(newCustomerId, (long) -1);
@@ -55,10 +46,11 @@ public class LockManager implements Manager {
    * @param customerId - Customer ID
    * @param ownerId - Administrator ID
    */
-  public void delete(Long customerId, Long ownerId) {
-    Long currentOwnerId = accessPermissions.get(customerId);
+  @Override
+  public void delete(final Long customerId, final Long ownerId) {
+    final long currentOwner = accessPermissions.get(customerId);
 
-    if (currentOwnerId.longValue() == ownerId.longValue()) {
+    if (currentOwner == ownerId) {
       customers.remove(customerId);
       accessPermissions.remove(customerId);
       total--;
@@ -66,33 +58,29 @@ public class LockManager implements Manager {
   }
 
   /**
-   * Returns customer if it's not owned by any administrator and lock the access permission.
+   *  Returns customer if it's not owned by any administrator.
+   *  If customer is obtained lock the access permission.
    *  @param customerId - Customer ID
    *  @param ownerId - Administrator ID
    *  @return customer - customer
    */
-  public Customer getCustomer(Long customerId, Long ownerId) {
+  @Override
+  public Customer getCustomer(final Long customerId, final Long ownerId) {
     mutex.lock();
-    try {
-      Long currentOwnerId = accessPermissions.get(customerId);
+    Customer customer = null;
 
-      // If no one have the access permission
-      if (currentOwnerId == -1 || currentOwnerId == ownerId) {
-        // The one who requested has the only access to the customer's information
-        accessPermissions.put(customerId, ownerId);
-        mutex.unlock();
+    final long currentOwnerId = accessPermissions.get(customerId);
 
-        return customers.get(customerId);
-      } else {
-        mutex.unlock();
-        return null;
-      }
+    // If no one have the access permission
+    if (currentOwnerId == -1 || currentOwnerId == ownerId) {
+      // The one who requested has the only access to the customer's information
+      accessPermissions.put(customerId, ownerId);
 
-    } catch (Exception e) {
-      e.printStackTrace();
+      customer = customers.get(customerId);
     }
-
-    return null;
+    mutex.unlock();
+    
+    return customer;
   }
 
   /**
@@ -101,22 +89,19 @@ public class LockManager implements Manager {
    *  @param customer - customer
    *  @param ownerId - Administrator ID
    */
-  public void release(Customer customer, Long ownerId) {
+  @Override
+  public void release(final Customer customer, final Long ownerId) {
     mutex.lock();
-    try {
-      if (customer != null) {
-        long customerId = customer.getID();
 
-        Long currentOwnerId = accessPermissions.get(customerId);
+    if (customer != null) {
+      final long customerId = customer.getID();
+      final long currentOwnerId = accessPermissions.get(customerId);
 
-        if (currentOwnerId.longValue() == ownerId.longValue()) {
-          accessPermissions.replace(customerId, (long) -1);
-          customer = null;
-        }
+      if (currentOwnerId == ownerId) {
+        accessPermissions.replace(customerId, (long) -1);
       }
-    } catch (Exception e) {
-      e.printStackTrace();
     }
+
     mutex.unlock();
   }
 }
