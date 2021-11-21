@@ -66,20 +66,21 @@ public class LockManager implements Manager {
    */
   @Override
   public Customer getCustomer(final Long customerId, final Long ownerId) {
-    mutex.lock();
+    final long currentOwnerId = accessPermissions.get(customerId);
     Customer customer = null;
 
-    final long currentOwnerId = accessPermissions.get(customerId);
-
+    mutex.lock();
     // If no one have the access permission
-    if (currentOwnerId == -1 || currentOwnerId == ownerId) {
-      // The one who requested has the only access to the customer's information
-      accessPermissions.put(customerId, ownerId);
+    try {
+      if (currentOwnerId == -1 || currentOwnerId == ownerId) {
+        // The one who requested has the only access to the customer's information
+        accessPermissions.put(customerId, ownerId);
 
-      customer = customers.get(customerId);
+        customer = customers.get(customerId);
+      }
+    } finally {
+      mutex.unlock();
     }
-    mutex.unlock();
-    
     return customer;
   }
 
@@ -93,15 +94,17 @@ public class LockManager implements Manager {
   public void release(final Customer customer, final Long ownerId) {
     mutex.lock();
 
-    if (customer != null) {
-      final long customerId = customer.getID();
-      final long currentOwnerId = accessPermissions.get(customerId);
+    try {
+      if (customer != null) {
+        final long customerId = customer.getID();
+        final long currentOwnerId = accessPermissions.get(customerId);
 
-      if (currentOwnerId == ownerId) {
-        accessPermissions.replace(customerId, (long) -1);
+        if (currentOwnerId == ownerId) {
+          accessPermissions.replace(customerId, (long) -1);
+        }
       }
+    } finally {
+      mutex.unlock();
     }
-
-    mutex.unlock();
   }
 }
