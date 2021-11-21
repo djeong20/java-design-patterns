@@ -1,0 +1,39 @@
+@startuml
+package com.iluwatar.pessimistic {
+  class App {
+    - LOGGER : Logger {static}
+    + App()
+    + main(args : String[]) {static}
+  }
+  class Customer {
+    - id : Long
+    - name : String
+    + Customer()
+    + Customer(name : String)
+    + getID() : Long
+    + getName() : String
+    + setID(newId : Long)
+    + setName(newName : String)
+  }
+  class LockManager {
+    - accessPermissions : Map<Long, Long>
+    - customers : Map<Long, Customer>
+    - mutex : Lock
+    - newCustomerId : long
+    + LockManager()
+    + LockManager(customerList : List<Customer>)
+    + delete(customerId : Long, ownerId : Long)
+    + getCustomer(customerId : Long, ownerId : Long) : Customer
+    + insert(newCustomer : Customer)
+    + release(customerId : Long, ownerId : Long)
+    + updateCustomerInfo(customer : Customer, ownerId : Long)
+  }
+  interface Manager {
+    + delete(Long, Long) {abstract}
+    + getCustomer(Long, Long) : Customer {abstract}
+    + insert(Customer) {abstract}
+    + updateCustomerInfo(Customer, Long) {abstract}
+  }
+}
+LockManager ..|> Manager 
+@enduml
