@@ -72,7 +72,6 @@ public class LockManager implements Manager {
    *  @return customer - customer
    */
   public Customer getCustomer(Long customerId, Long ownerId) {
-    // TODO: Need to acquire mutex lock
     mutex.lock();
     try {
       Long currentOwnerId = accessPermissions.get(customerId);
