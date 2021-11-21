@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class LockManagerTest {
 
+    /**
+     * Test if new customer information is inserted
+     */
     @Test
     void testInsert() {
         var lockManager = new LockManager();
@@ -24,6 +27,9 @@ class LockManagerTest {
         assertEquals(lockManager.total, 3);
     }
 
+    /**
+     * Test if customer information is deleted
+     */
     @Test
     void testDelete() {
         var lockManager = new LockManager();
@@ -49,6 +55,9 @@ class LockManagerTest {
         assertEquals(lockManager.total, 1);
     }
 
+    /**
+     * Test if customer access is locked when admin gets the permission
+     */
     @Test
     void testLock() {
         var lockManager = new LockManager();
@@ -66,6 +75,9 @@ class LockManagerTest {
         assertNull(davidCustomer);
     }
 
+    /**
+     * Test if customer access is release when admin release the permission
+     */
     @Test
     void testRelease() {
         var lockManager = new LockManager();
