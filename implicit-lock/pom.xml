@@ -33,7 +33,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>implicit-lock</artifactId>
+	<artifactId>implicitlock</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -51,7 +51,7 @@
 						<configuration>
 							<archive>
 								<manifest>
-									<mainClass>com.iluwatar.implicit-lock.App</mainClass>
+									<mainClass>com.iluwatar.implicitlock.App</mainClass>
 								</manifest>
 							</archive>
 						</configuration>
