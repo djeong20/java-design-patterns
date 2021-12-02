@@ -10,8 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Donghyeon Jeong
  */
 public class LockManager {
-  private Set<Client> lockedClients;
-  private Lock mutex;
+  private final transient Set<Client> lockedClients; // List of locked clients
+  private final transient Lock mutex; // Mutex lock
 
   /**
    * Lock Manager Default Constructor.
@@ -28,7 +28,7 @@ public class LockManager {
    *  @param client - Customer
    *  @return result - boolean
    */
-  boolean lock(Client client) {
+  public boolean lock(Client client) {
     boolean result;
 
     mutex.lock();
@@ -53,17 +53,17 @@ public class LockManager {
    *  @param client - Customer
    *  @return result - boolean
    */
-  boolean release(Client client) {
+  public boolean release(Client client) {
     boolean result;
 
     mutex.lock();
 
     try {
       if (lockedClients.contains(client)) {
-        result = false;
-      } else {
         lockedClients.remove(client);
         result = true;
+      } else {
+        result = false;
       }
     } finally {
       mutex.unlock();
@@ -72,7 +72,7 @@ public class LockManager {
     return result;
   }
 
-  boolean contains(Client client) {
+  public boolean contains(Client client) {
     return lockedClients.contains(client);
   }
 }

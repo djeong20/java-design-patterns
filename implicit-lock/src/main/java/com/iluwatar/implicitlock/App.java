@@ -27,9 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * In Implicit Lock pattern, if an item might be locked anywhere it must be locked everywhere.
- * Ignoring its locking strategy allows a business transaction to create inconsistent data.
- * Locking tasks that cannot be overlooked should be handled implicitly by the application.
- * The interface of the implementations can be changed without affecting the clients.
+ * This locking strategy allows a business transaction to create inconsistent data.
+ * Locking tasks should be handled implicitly by the application.
+ * The interface can be changed without affecting the clients.
  */
 @Slf4j
 public class App {

@@ -10,8 +10,8 @@ import java.util.Set;
  * @author Donghyeon Jeong
  */
 public class Framework {
-  private LockManager lockManager;
-  private Set<Client> clients;
+  private final transient LockManager lockManager; // Lock manager
+  private final transient Set<Client> clients; // List of clients
 
   /**
    * Default constructor for Framework class.
@@ -47,7 +47,7 @@ public class Framework {
 
   /**
    * Delete client from the list of clients.
-   * If client exists in the list and is not locked, delete from list and return true.
+   * If client exists in the list and unlocked, delete from list and return true.
    * If not, return false.
    * @param client - New client
    * @return result - boolean
@@ -55,12 +55,10 @@ public class Framework {
   public boolean deleteClients(Client client) {
     boolean result = false;
 
-    if (clients.contains(client)) {
+    if (clients.contains(client) && !lockManager.contains(client)) {
       // Check if client is locked
-      if (!lockManager.contains(client)) {
         clients.remove(client);
         result = true;
-      }
     }
 
     return result;
@@ -77,11 +75,9 @@ public class Framework {
     Client result = null;
 
     for (Client client : clients) {
-      if (clientId == client.getClientId()) {
-        // Framework calls lock manager and lock client
-        if (lockManager.lock(client)) {
-          result = client;
-        }
+      // Framework calls lock manager and lock client
+      if (clientId == client.getClientId() && lockManager.lock(client)) {
+        result = client;
       }
     }
 

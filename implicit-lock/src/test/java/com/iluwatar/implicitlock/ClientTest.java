@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Client test
  */
-public class ClientTest {
+class ClientTest {
     /**
      * This test is used to confirm that client ID is set correctly when ID is not initialized
      */
