@@ -30,7 +30,6 @@ public class LockManager {
    */
   public boolean lock(Client client) {
     boolean result;
-
     mutex.lock();
 
     try {
@@ -55,7 +54,6 @@ public class LockManager {
    */
   public boolean release(Client client) {
     boolean result;
-
     mutex.lock();
 
     try {
@@ -72,6 +70,11 @@ public class LockManager {
     return result;
   }
 
+  /**
+   *  Check whether client is locked or not.
+   *  @param client - Customer
+   *  @return result - boolean
+   */
   public boolean contains(Client client) {
     return lockedClients.contains(client);
   }
