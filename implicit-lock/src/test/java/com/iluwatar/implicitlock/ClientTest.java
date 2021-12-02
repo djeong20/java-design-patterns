@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class ClientTest {
     /**
-     * This test is used to confirm that client ID is set correctly when ID is not initialized
+     * This test is used to confirm that client ID is set when ID is not initialized
      */
     @Test
     void testClientId1() {
@@ -18,7 +18,7 @@ class ClientTest {
     }
 
     /**
-     * This test is used to confirm that client ID is set correctly when ID is initialized
+     * This test is used to confirm that client ID is set when ID is initialized
      */
     @Test
     void testClientId2() {
