@@ -57,8 +57,8 @@ public class Framework {
 
     if (clients.contains(client) && !lockManager.contains(client)) {
       // Check if client is locked
-        clients.remove(client);
-        result = true;
+      clients.remove(client);
+      result = true;
     }
 
     return result;
