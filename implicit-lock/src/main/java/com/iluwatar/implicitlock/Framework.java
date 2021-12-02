@@ -54,21 +54,37 @@ public class Framework {
    */
   public boolean deleteClients(Client client) {
     boolean result = false;
-    long clientId = client.getClientId();
 
-    for (Client currentClient : clients) {
-      if (clientId == currentClient.getClientId()) {
-        // TODO: Check if client is locked
+    if (clients.contains(client)) {
+      // Check if client is locked
+      if (!lockManager.contains(client)) {
+        clients.remove(client);
         result = true;
-        break;
       }
-    }
-
-    if (result) {
-      clients.remove(client);
     }
 
     return result;
   }
 
+  /**
+   * Get client with the request of transaction
+   * If client exists in the list and is not locked, return client
+   * If not, return null.
+   * @param clientId - Client ID
+   * @return result - Client
+   */
+  public Client loadCustomer(long clientId) {
+    Client result = null;
+
+    for (Client client : clients) {
+      if (clientId == client.getClientId()) {
+        // Framework calls lock manager and lock client
+        if (lockManager.lock(client)) {
+          result = client;
+        }
+      }
+    }
+
+    return result;
+  }
 }

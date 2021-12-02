@@ -71,4 +71,8 @@ public class LockManager {
 
     return result;
   }
+
+  boolean contains(Client client) {
+    return lockedClients.contains(client);
+  }
 }
