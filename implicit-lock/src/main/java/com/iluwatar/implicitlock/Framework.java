@@ -12,6 +12,7 @@ import java.util.Set;
 public class Framework {
   private final transient LockManager lockManager; // Lock manager
   private final transient Set<Client> clients; // List of clients
+  public transient int total; // Total number of clients
 
   /**
    * Default constructor for Framework class.
@@ -19,6 +20,7 @@ public class Framework {
   public Framework() {
     lockManager = new LockManager();
     clients = new HashSet<>();
+    total = 0;
   }
 
   /**
@@ -40,6 +42,7 @@ public class Framework {
 
     if (result) {
       clients.add(client);
+      total++;
     }
 
     return result;
@@ -58,6 +61,7 @@ public class Framework {
     if (clients.contains(client) && !lockManager.contains(client)) {
       // Check if client is locked
       clients.remove(client);
+      total--;
       result = true;
     }
 
@@ -71,7 +75,7 @@ public class Framework {
    * @param clientId - Client ID
    * @return result - Client
    */
-  public Client loadCustomer(long clientId) {
+  public Client loadClient(long clientId) {
     Client result = null;
 
     for (Client client : clients) {
@@ -79,6 +83,24 @@ public class Framework {
       if (clientId == client.getClientId() && lockManager.lock(client)) {
         result = client;
       }
+    }
+
+    return result;
+  }
+
+  /**
+   * Release locked client with the request of transaction
+   * If client exists in the list and is locked, release and return true
+   * If not, return false.
+   * @param client - Client ID
+   * @return result - boolean
+   */
+  public boolean releaseClient(Client client) {
+    boolean result = false;
+
+    // Framework calls lock manager and release client
+    if (lockManager.contains(client) && lockManager.release(client)) {
+      result = true;
     }
 
     return result;
